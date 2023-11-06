@@ -1,6 +1,5 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-analytics.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -20,14 +19,6 @@ const db = getDatabase(app);
 
 const dataRef = ref(db, 'data/1');
 
-onValue(dataRef, (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-        document.getElementById("data-display").textContent = data.contenido;
-    } else {
-        document.getElementById("data-display").textContent = "No data available.";
-    }
-});
 
 // Function to add data to Firebase
 function addData() {
@@ -38,7 +29,20 @@ function addData() {
         console.log("Data written successfully");
     }).catch((error) => {
         console.error("Error writing data:", error);
-    });;
+    });
 }
+
 document.querySelector("#button").addEventListener("click", addData);
+
+onValue(dataRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        const p=document.createElement("p");
+        p.textContent=data.contenido;
+        document.body.appendChild(p);
+    } else {
+        document.getElementById("data-display").textContent = "No data available.";
+    }
+});
+
 
