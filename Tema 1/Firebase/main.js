@@ -10,17 +10,15 @@ const firebaseConfig = {
     storageBucket: "rafael-1b651.appspot.com",
     messagingSenderId: "1053548854508",
     appId: "1:1053548854508:web:7fa0f20b51847b10a239c9",
-    databaseURL: "https://rafael-1b651-default-rtdb.europe-west1.firebaseio.com",
+    databaseURL: "https://rafael-1b651-default-rtdb.europe-west1.firebasedatabase.app",
     measurementId: "G-F4889N3TWQ"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getDatabase(app);
 
-const dataRef = ref(db, 'data');
-
+const dataRef = ref(db, 'data/1');
 
 onValue(dataRef, (snapshot) => {
     const data = snapshot.val();
@@ -34,9 +32,13 @@ onValue(dataRef, (snapshot) => {
 // Function to add data to Firebase
 function addData() {
     const contenidoTexto = document.getElementById("new-data").value;
-    set(ref(db, 'data'), {
+    set(dataRef, {
         contenido: contenidoTexto
-    });
+    }).then(() => {
+        console.log("Data written successfully");
+    }).catch((error) => {
+        console.error("Error writing data:", error);
+    });;
 }
 document.querySelector("#button").addEventListener("click", addData);
 
