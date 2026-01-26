@@ -1,0 +1,60 @@
+services:
+  spark-master:
+    build:
+      context: .
+      dockerfile: ./docker/spark/Dockerfile
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+    volumes:
+      - ./apps_bda:/opt/spark-apps
+      - ./data_bda:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
+
+  spark-worker-a:
+    build:
+      context: .
+      dockerfile: ./docker/spark/Dockerfile
+    ports:
+      - "9091:8080"
+      - "7000:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-a
+      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
+    volumes:
+      - ./apps_bda:/opt/spark-apps
+      - ./data_bda:/opt/spark-data
+
+  spark-worker-b:
+    build:
+      context: .
+      dockerfile: ./docker/spark/Dockerfile
+    ports:
+      - "9095:8080"
+      - "7001:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-b
+      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
+
+    volumes:
+      - ./apps_bda:/opt/spark-apps
+      - ./data_bda:/opt/spark-data

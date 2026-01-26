@@ -1,0 +1,10 @@
+{
+  "name": "Neo4j Cypher",
+  "index": "index.html",
+  "selectors": {
+    "entry": "h1, h2, h3"
+  },
+  "urls": [
+    "https://neo4j.com/docs/cypher-manual/current/introduction/"
+  ]
+}
