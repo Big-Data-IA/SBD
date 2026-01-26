@@ -12,7 +12,6 @@ services:
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
-      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
 
   spark-worker-a:
     build:
@@ -31,7 +30,6 @@ services:
       - SPARK_EXECUTOR_MEMORY=1G
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker-a
-      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
     volumes:
       - ./apps_bda:/opt/spark-apps
       - ./data_bda:/opt/spark-data
@@ -53,7 +51,6 @@ services:
       - SPARK_EXECUTOR_MEMORY=1G
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker-b
-      - DOTNET_WORKER_DIR=/opt/spark-apps/Dotnet/worker
 
     volumes:
       - ./apps_bda:/opt/spark-apps
