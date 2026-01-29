@@ -8,6 +8,8 @@ def get_random_string(length):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(length))
 
+
+#Cambiar por obtener la palabra más repetida
 def count_words_df(filename):
     spark = SparkSession.builder \
         .master("spark://spark-master:7077") \
@@ -19,7 +21,8 @@ def count_words_df(filename):
 
     # Split lines into words, explode to get one word per row
     words_df = df.select(explode(split(col("value"), " ")).alias("word"))
-
+    
+    words_df.head(10)
     # Count words
     word_counts = words_df.groupBy("word").count()
 

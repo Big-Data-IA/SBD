@@ -21,6 +21,7 @@ ENV SPARK_VERSION=4.0.1 \
 # Copy Spark binaries
 COPY resources/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark.tgz
 
+
 RUN mkdir -p /opt/spark \
     && tar -xf /tmp/spark.tgz -C /opt/spark --strip-components=1 \
     && rm /tmp/spark.tgz
