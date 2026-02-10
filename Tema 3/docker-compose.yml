@@ -7,8 +7,8 @@ services:
       - "9090:8080"
       - "7077:7077"
     volumes:
-      - ./apps_bda:/opt/spark-apps
-      - ./data_bda:/opt/spark-data
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
@@ -31,8 +31,8 @@ services:
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker-a
     volumes:
-      - ./apps_bda:/opt/spark-apps
-      - ./data_bda:/opt/spark-data
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
 
   spark-worker-b:
     build:
@@ -51,7 +51,19 @@ services:
       - SPARK_EXECUTOR_MEMORY=1G
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker-b
-
     volumes:
-      - ./apps_bda:/opt/spark-apps
-      - ./data_bda:/opt/spark-data
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566" # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559" # external services port range
+    environment:
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - "localstackVolume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+volumes:
+  localstackVolume:

@@ -1,33 +1,45 @@
 FROM openjdk:17.0.2-slim-bullseye AS builder
 
-# Add Dependencies for PySpark 
+# ------------------------------
+# System + Python deps
+# ------------------------------
 RUN apt-get update && apt-get install -y \
     curl vim wget software-properties-common ssh ca-certificates \
     python3 python3-pip python3-numpy python3-matplotlib python3-scipy python3-pandas \
-    unzip
+    unzip maven git && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set python3 as default
 RUN update-alternatives --install "/usr/bin/python" "python" "$(which python3)" 1
-
-# Install PySpark
 RUN pip3 install pyspark
 
-# Fix the value of PYTHONHASHSEED
-ENV SPARK_VERSION=4.0.1 \
+# ------------------------------
+# Spark
+# ------------------------------
+ENV SPARK_VERSION=4.0.0 \
     HADOOP_VERSION=3 \
     SPARK_HOME=/opt/spark \
     PYTHONHASHSEED=1
 
-# Copy Spark binaries
 COPY resources/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark.tgz
 
+RUN mkdir -p /opt/spark && \
+    tar -xf /tmp/spark.tgz -C /opt/spark --strip-components=1 && \
+    rm /tmp/spark.tgz
 
-RUN mkdir -p /opt/spark \
-    && tar -xf /tmp/spark.tgz -C /opt/spark --strip-components=1 \
-    && rm /tmp/spark.tgz
+# ------------------------------
+# Use Maven to pull Hadoop AWS + SDK v2 + Postgres JARs
+# ------------------------------
+WORKDIR /tmp/maven-build
+
+# Copy the pom.xml from your project
+COPY resources/pom.xml .
+
+# Fetch all dependencies into /opt/spark/jars
+RUN mvn dependency:copy-dependencies -DoutputDirectory=/opt/spark/jars
 
 # ------------------------------
 # Final image
+# ------------------------------
 FROM builder AS apache-spark
 
 WORKDIR /opt/spark
@@ -44,17 +56,13 @@ ENV SPARK_MASTER_PORT=7077 \
 
 EXPOSE 8080 7077 7000
 
-# Spark logs to stdout
 RUN mkdir -p $SPARK_LOG_DIR && \
     touch $SPARK_MASTER_LOG && \
     touch $SPARK_WORKER_LOG && \
     ln -sf /dev/stdout $SPARK_MASTER_LOG && \
     ln -sf /dev/stdout $SPARK_WORKER_LOG
 
-# Copy start script
 COPY /scripts/start-spark.sh /
-RUN sed -i 's/\r$//g' /start-spark.sh
-RUN chmod +x /start-spark.sh
+RUN sed -i 's/\r$//g' /start-spark.sh && chmod +x /start-spark.sh
 
-# Set default CMD
 CMD ["/bin/bash", "/start-spark.sh"]
