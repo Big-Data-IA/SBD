@@ -20,6 +20,8 @@ ENV SPARK_VERSION=4.0.0 \
     SPARK_HOME=/opt/spark \
     PYTHONHASHSEED=1
 
+#COPY conf/*.xml $HADOOP_CONF_DIR/
+    
 COPY resources/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark.tgz
 
 RUN mkdir -p /opt/spark && \

@@ -7,51 +7,63 @@
     <groupId>local.spark</groupId>
     <artifactId>spark-local-deps</artifactId>
     <version>1.0.0</version>
-
-    <properties>
-        <!-- Versions -->
-        <hadoop.version>3.4.2</hadoop.version>
-        <aws.sdk.version>2.41.9</aws.sdk.version>
-        <postgres.version>42.7.9</postgres.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
+    <packaging>jar</packaging>
 
     <dependencies>
-        <!-- Hadoop AWS integration -->
+        <!-- Hadoop AWS with actual jars -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
-            <version>${hadoop.version}</version>
+            <version>3.3.4</version>
         </dependency>
 
-        <!-- AWS SDK v2 for S3 -->
+        <!-- AWS Java SDK bundle -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3</artifactId>
-            <version>${aws.sdk.version}</version>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-bundle</artifactId>
+            <version>1.12.554</version>
         </dependency>
 
-        <!-- PostgreSQL JDBC (RDS) -->
+        <!-- Optional: Logging for Spark/Hadoop -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgres.version}</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.36</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Optional: avoid Maven warnings about missing main class -->
+            <!-- Maven Assembly Plugin para generar un jar “uber” con dependencias -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.5.0</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.apache.spark.deploy.SparkSubmit</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
 </project>
